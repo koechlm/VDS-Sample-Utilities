@@ -80,10 +80,11 @@ namespace VDSUtils
         [System.Runtime.InteropServices.DllImport("User32.dll", SetLastError = true)]
         static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
                     
-        public object m_GetMainViewModelPropValue(String m_ViewModelFullName, String m_PropName)
+        public object m_GetMainViewModelPropValue(object m_InvApp,String m_ViewModelFullName, String m_PropName)
         {
             try
             {
+                m_Inv = (Inventor.Application)m_InvApp;
                 m_Doc = m_Inv.Documents.Open(m_ViewModelFullName,false);
                         foreach (PropertySet m_PropSet in m_Doc.PropertySets)
                         {
@@ -103,12 +104,13 @@ namespace VDSUtils
             return "iProperty not found";
         }
 
-        public String m_GetMainViewModelPath()
+        public String m_GetMainViewModelPath(object m_InvApp)
         {
             try
             {
-                if (m_ConnectInv()==true)
-                {
+                m_Inv = (Inventor.Application)m_InvApp;           
+                //if (m_ConnectInv()==true)
+                //{
                     if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kDrawingDocumentObject)
                     {
                         m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
@@ -123,7 +125,7 @@ namespace VDSUtils
                         m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
                         return m_ModelPath;
                     }
-                }
+                //}
             }
             catch
                 {
@@ -133,10 +135,11 @@ namespace VDSUtils
         }
 
         // insert provided component (ipt/iam) into current assembly - waiting for user interaction to finalize
-        public void m_PlaceComponent(String m_CompFullFileName)
+        private void m_PlaceComponent(object m_InvApp, String m_CompFullFileName)
         {
-            if (m_ConnectInv() == true)
-            {
+            m_Inv = (Inventor.Application)m_InvApp;
+            //if (m_ConnectInv() == true)
+            //{
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
                     try
@@ -155,16 +158,17 @@ namespace VDSUtils
                     }
 
                 }
-            }
+            //}
         }
 
         //create new file and insert selected component as derived - waiting for user interaction to finalize
-        public void m_DeriveComponent(String m_CompFullFileName)
+        private void m_DeriveComponent(object m_InvApp,String m_CompFullFileName)
         {
             //create new file and set file name & path accordingly
-            if (m_ConnectInv() == true)
-            {
-                Inventor.PartDocument m_NewPart = (PartDocument)m_Inv.Documents.Add(DocumentTypeEnum.kPartDocumentObject, "", true);
+            m_Inv = (Inventor.Application)m_InvApp;
+            //if (m_ConnectInv() == true)
+            //{
+            Inventor.PartDocument m_NewPart = (PartDocument)m_Inv.Documents.Add(DocumentTypeEnum.kPartDocumentObject, "", true);
 
                 //insert selected component as derived interactively (show dialog of derive options instead of direct placement)
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kPartDocumentObject)
@@ -183,16 +187,17 @@ namespace VDSUtils
                     {
                     }
                 }
-            }
+            //}
         }
 
         //run an iLogic rule providing the rule's name and internal/external option
-        public String m_RunRule(String m_RuleName) //, Boolean m_External=false)
+        public String m_RunRule(object m_InvApp,String m_RuleName) //, Boolean m_External=false)
         {
             string m_RunRuleResult = null;
 
-            if (m_ConnectInv() == true)
-            {            
+            m_Inv = (Inventor.Application)m_InvApp;
+            //if (m_ConnectInv() == true)
+            //{            
                 //iLogic is also an addin which has its guid
                 string iLogicAddinGuid = "{3BDD8D79-2179-4B11-8A5A-257B1C0263AC}";
 
@@ -254,27 +259,28 @@ namespace VDSUtils
                 {
                     return m_RunRuleResult = "iLogic Module not loaded; rule could not be called";
                 }
-            }
-            else
-            {
-                return m_RunRuleResult = "Inventor Application not found; rule could not be called";
-            }
+            //}
+            //else
+            //{
+            //    return m_RunRuleResult = "Inventor Application not found; rule could not be called";
+            //}
    
         }
 
-        public Boolean m_ConnectInv ()
-        {
-            // Try to get an active instance of Inventor
-            try
-                {
-                    m_Inv = System.Runtime.InteropServices.Marshal.GetActiveObject("Inventor.Application") as Inventor.Application;
-                    return true;
-                }
-            catch
-                {
-                    return false;
-                }
-        }
+        //obsolete in 2017 VDS with direct hand over of application object from calling script
+        //private Boolean m_ConnectInv ()
+        //{
+        //    // Try to get an active instance of Inventor
+        //    try
+        //        {
+        //            m_Inv = System.Runtime.InteropServices.Marshal.GetActiveObject("Inventor.Application") as Inventor.Application;
+        //            return true;
+        //        }
+        //    catch
+        //        {
+        //            return false;
+        //        }
+        //}
        
     }
 
