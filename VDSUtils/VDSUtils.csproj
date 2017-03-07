@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>..\..\..\..\..\..\ProgramData\Autodesk\Vault 2017\Extensions\DataStandard\Vault\addinVault\VDSUtils.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,16 +53,7 @@
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Vault Professional 2017\Explorer\Autodesk.DataManagement.Client.Framework.Vault.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Autodesk.iLogic.Automation">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Inventor 2017\Bin\Autodesk.iLogic.Automation.dll</HintPath>
-      <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Autodesk.iLogic.Interfaces">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Inventor 2017\Bin\Autodesk.iLogic.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Autodesk.Inventor.Interop, Version=21.0.0.0, Culture=neutral, PublicKeyToken=d84147f8b4276564, processorArchitecture=MSIL">
+    <Reference Include="Autodesk.Inventor.Interop, Version=21.2.0.0, Culture=neutral, PublicKeyToken=d84147f8b4276564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Inventor 2017\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
