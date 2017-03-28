@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDSUtils", "VDSUtils\VDSUtils.csproj", "{07BD9346-7387-4D5B-B5A5-7A4FFFC8DEA4}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickstartUtilityLibrary", "VDSUtils\QuickstartUtilityLibrary.csproj", "{07BD9346-7387-4D5B-B5A5-7A4FFFC8DEA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

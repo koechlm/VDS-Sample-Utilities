@@ -15,7 +15,7 @@ using AcInteropCom = Autodesk.AutoCAD.Interop.Common;
 /// <summary>
 /// Quickstart Library to extend VDS scripting capabilities.
 /// </summary>
-namespace VDSUtils
+namespace QuickstartUtilityLibrary
 {
     /// <summary>
     /// Quickstart Library to extend VDS scripting capabilities.
