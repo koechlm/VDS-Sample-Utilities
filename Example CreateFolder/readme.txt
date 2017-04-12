@@ -1,1 +1,0 @@
-creates subfolder .\CAD with filled properties Titel, Beschreibung

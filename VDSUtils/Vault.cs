@@ -37,7 +37,7 @@ namespace QuickstartUtilityLibrary
             ServerIdentities mServer = new ServerIdentities();
             mServer.DataServer = server;
             mServer.FileServer = server;
-             Autodesk.Connectivity.WebServicesTools.UserPasswordCredentials mCred = new Autodesk.Connectivity.WebServicesTools.UserPasswordCredentials(mServer, vault, user, pw);
+            Autodesk.Connectivity.WebServicesTools.UserPasswordCredentials mCred = new Autodesk.Connectivity.WebServicesTools.UserPasswordCredentials(mServer, vault, user, pw);
             return mCred;
         }
 
@@ -94,7 +94,7 @@ namespace QuickstartUtilityLibrary
         public List<long> mGetLinkedChildren1(Connection con, long mId, string mClsId, string mFilter)
         {
             IEnumerable<PersistableIdEntInfo> mEntInfo = new PersistableIdEntInfo[] { new PersistableIdEntInfo(mClsId, mId, true, false) };
-            IDictionary<PersistableIdEntInfo,IEntity> mIEnts = con.EntityOperations.ConvertEntInfosToIEntities(mEntInfo) ;
+            IDictionary<PersistableIdEntInfo, IEntity> mIEnts = con.EntityOperations.ConvertEntInfosToIEntities(mEntInfo);
             IEntity mIEnt = null;
             try
             {
@@ -124,7 +124,7 @@ namespace QuickstartUtilityLibrary
         /// <param name="mParEntIds"></param>
         /// <param name="mClsIds"></param>
         /// <returns></returns>
-        private IEnumerable<IEntity> GetLinkedChildren2(Connection con, long[] mParEntIds,  string[] mClsIds)
+        private IEnumerable<IEntity> GetLinkedChildren2(Connection con, long[] mParEntIds, string[] mClsIds)
         {
             List<PersistableIdEntInfo> mEntInfo = new List<PersistableIdEntInfo>();
             for (int i = 0; i < mParEntIds.Length; i++)
@@ -244,27 +244,153 @@ namespace QuickstartUtilityLibrary
             return m_ModelPath = "";
         }
 
+        public Dictionary<string, string> m_GetFdsKeys(object m_InvApp, Dictionary<string, string> mFdsKeys)
+        {
+            try
+            {
+                m_Inv = (Inventor.Application)m_InvApp;
+                m_Doc = m_Inv.ActiveDocument;
+                if (m_Doc.DocumentInterests.HasInterest("factory.filetype.factory_layout_template"))
+                {
+                    //FDS Type
+                    mFdsKeys.Add("FdsType", "FDS-Layout");
+                   
+                    //FDS Property Set exists for syncronized layouts
+                    foreach (PropertySet m_PropSet in m_Doc.PropertySets)
+                    {
+                        if (m_PropSet.Name == "autodesk.factory.inventor.DwgInv")
+                        {
+                            foreach (Property m_Prop in m_PropSet)
+                            {
+                                mFdsKeys.Add(m_Prop.Name, m_Prop.Value);
+                            }
+                            //Get Fullname set by synchronization, to avoid save to other location
+                            mFdsKeys.Add("FdsNewFullFileName", m_Doc.File.FullFileName);
+                            System.IO.FileInfo mFdsFileInfo = new System.IO.FileInfo(m_Doc.File.FullFileName);
+                            string mFdsPath = mFdsFileInfo.Directory.FullName;
+                            mFdsKeys.Add("FdsNewPath", mFdsPath);
+                        }
+                    }
+                }
+                if (m_Doc.DocumentInterests.HasInterest("factory.filetype.factory_asset"))
+                {
+                    mFdsKeys.Add("FdsType", "FDS-Asset");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return mFdsKeys;
+        }
+        public Dictionary<string, string> m_GetFdsAcadProps(object m_InvApp, Dictionary<string, string> mFdsKeys)
+        {
+            Inventor.Document mDwgSource = null;
+            DefaultNonInventorDWGFileOpenBehaviorEnum mUserOpenOpt = DefaultNonInventorDWGFileOpenBehaviorEnum.kRegularOpenNonInventorDWGFile;
+
+            try
+            {
+                m_Inv = (Inventor.Application)m_InvApp;
+                m_Doc = m_Inv.ActiveDocument;
+                if (m_Doc.DocumentInterests.HasInterest("factory.filetype.factory_layout_template"))
+                {
+                    //FDS Type
+                    mFdsKeys.Add("FdsType", "FDS-Layout");
+
+                    //FDS Property Set exists for syncronized layouts
+                    foreach (PropertySet m_PropSet in m_Doc.PropertySets)
+                    {
+                        if (m_PropSet.Name == "autodesk.factory.inventor.DwgInv")
+                        {
+                            foreach (Property m_Prop in m_PropSet)
+                            {
+                                mFdsKeys.Add(m_Prop.Name, m_Prop.Value);
+                            }
+
+                            //Get Fullname set by synchronization, to avoid save to other location
+                            mFdsKeys.Add("FdsNewFullFileName", m_Doc.File.FullFileName);
+                            System.IO.FileInfo mFdsFileInfo = new System.IO.FileInfo(m_Doc.File.FullFileName);
+                            string mFdsPath = mFdsFileInfo.Directory.FullName;
+                            mFdsKeys.Add("FdsNewPath", mFdsPath);
+
+                            if (m_Doc.FileSaveCounter >= 0) //if save counter = 0, the file is currently in the sync process; we must not open the sync source then.
+                            {
+                                //Open the source DWG to read properties;
+                                try
+                                {
+                                    string mFdsSourceFullFileName = mFdsPath + "\\" + mFdsKeys["DwgFileName"];
+                                    //read inventor application option to reset later
+                                    mUserOpenOpt = m_Inv.DrawingOptions.DefaultNonInventorDWGFileOpenBehavior;
+                                    m_Inv.DrawingOptions.DefaultNonInventorDWGFileOpenBehavior = DefaultNonInventorDWGFileOpenBehaviorEnum.kRegularOpenNonInventorDWGFile;
+                                    mDwgSource = m_Inv.Documents.Open(mFdsSourceFullFileName, false);
+                                    //Read the properties and add to dictionary if a value exists
+                                    foreach (PropertySet m_TempPropSet in mDwgSource.PropertySets)
+                                    {
+                                        if (m_TempPropSet.DisplayName.Contains("Summary") || m_TempPropSet.DisplayName == "User Defined Properties")
+                                        {
+                                            foreach (Property m_TempProp in m_TempPropSet)
+                                            {
+                                                if (!string.IsNullOrEmpty(m_TempProp.Value))
+                                                {
+                                                    mFdsKeys.Add(m_TempProp.Name, m_TempProp.Value);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                                catch (Exception)
+                                {
+                                    //throw;
+                                }
+                                finally
+                                {
+                                    mDwgSource.Close(true);
+                                    //reset application option
+                                    m_Inv.DrawingOptions.DefaultNonInventorDWGFileOpenBehavior = mUserOpenOpt;
+                                }
+                            }
+                            else
+                            {
+                                mFdsKeys.Add("FdsAcadProps", "We can't retrieve properties before the calling file is saved.");
+                            }
+                        }
+                    }
+                }
+                if (m_Doc.DocumentInterests.HasInterest("factory.filetype.factory_asset"))
+                {
+                    mFdsKeys.Add("FdsType", "FDS-Asset");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return mFdsKeys;
+        }
+
     }
     /// <summary>
     /// Library of VDS Quickstart calls to hosting AutoCAD session
     /// </summary>
     public class AcadHelpers
     {
-        AcInterop.AcadApplication m_Acad = null;
+        AcInterop.AcadApplication mAcad = null;
         private const string progID = "AutoCAD.Application";
-       
+        AcInterop.AcadDocument mAcDoc = null;
+
         [System.Runtime.InteropServices.DllImport("User32.dll", SetLastError = true)]
         static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
-       
+
         /// <summary>
         /// Get AutoCAD session hosting; deprecated as VDS 2017 dialogs share the hosting application object
         /// </summary>
         /// <returns></returns>
-        private Boolean m_ConnectAcad ()
+        private Boolean m_ConnectAcad()
         {
             try
             {
-                m_Acad = (AcInterop.AcadApplication)System.Runtime.InteropServices.Marshal.GetActiveObject(progID);
+                mAcad = (AcInterop.AcadApplication)System.Runtime.InteropServices.Marshal.GetActiveObject(progID);
                 return true;
             }
             catch
@@ -273,25 +399,54 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+        public Boolean mFdsDrawing(object m_AcadApp)
+        {
+            mAcad = (AcInterop.AcadApplication)m_AcadApp;
+            mAcDoc = mAcad.ActiveDocument;
+            AcInteropCom.AcadDatabase m_AcDB = (dynamic)mAcDoc.Database;
+            AcInteropCom.AcadSummaryInfo m_AcSummInfo = m_AcDB.SummaryInfo;
+            foreach (AcInteropCom.AcadBlock mBlock in mAcDoc.Blocks)
+            {
+                if (mBlock.Name.Contains("FDS"))
+                {
+                    return true;
+                };
+            }
+            return false;
+        }
+
+        public Boolean mFdsDict(object m_AcadApp)
+        {
+            mAcad = (AcInterop.AcadApplication)m_AcadApp;
+            mAcDoc = mAcad.ActiveDocument;
+            AcInteropCom.AcadDatabase m_AcDB = mAcDoc.Database;
+
+
+
+            return false;
+        }
+
+
         /// <summary>
         /// Switch running AutoCAD application; requires updated - VDS 2017 shares application object in VDS Dialog
         /// </summary>
-        private void m_GoToAcad ()
+        private void m_GoToAcad(object m_AcadApp)
         {
-            if (m_ConnectAcad() == true)
+
+            try
             {
-                try
-                {
-                    AcInterop.AcadDocument m_AcDoc = m_Acad.ActiveDocument;
-                    IntPtr mWinPt = (IntPtr)m_Acad.HWND;
-                    SwitchToThisWindow(mWinPt, true);
-                    //String m_Command = @"(Command ""_Insert"" ""C:/AB_Vault/Konstruktion/01-0080.dwg"") "";"" ";
-                    //m_AcDoc.SendCommand(m_Command);
-                 }
-                catch
-                {
-                }
+                mAcad = (AcInterop.AcadApplication)m_AcadApp;
+                mAcDoc = mAcad.ActiveDocument;
+                IntPtr mWinPt = (IntPtr)mAcad.HWND;
+                SwitchToThisWindow(mWinPt, true);
+                //String m_Command = @"(Command ""_Insert"" ""C:/AB_Vault/Konstruktion/01-0080.dwg"") "";"" ";
+                //m_AcDoc.SendCommand(m_Command);
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
         }
     }
 }
