@@ -415,13 +415,11 @@ namespace QuickstartUtilityLibrary
             return false;
         }
 
-        public Boolean mFdsDict(object m_AcadApp)
+        private Boolean mFdsDict(object m_AcadApp)
         {
             mAcad = (AcInterop.AcadApplication)m_AcadApp;
             mAcDoc = mAcad.ActiveDocument;
             AcInteropCom.AcadDatabase m_AcDB = mAcDoc.Database;
-
-
 
             return false;
         }
