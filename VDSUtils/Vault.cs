@@ -244,6 +244,20 @@ namespace QuickstartUtilityLibrary
             return m_ModelPath = "";
         }
 
+        public bool m_FDUActive(object mInvApp)
+        {
+            m_Inv = (Application)mInvApp;
+            ApplicationAddIn mFDUAddIn = m_Inv.ApplicationAddIns.get_ItemById("{031C8B05-13C0-4C6C-B8FD-5A19DACCB64F}");
+            if (mFDUAddIn !=null)
+            {
+                if (mFDUAddIn.Activated)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public Dictionary<string, string> m_GetFdsKeys(object m_InvApp, Dictionary<string, string> mFdsKeys)
         {
             try
