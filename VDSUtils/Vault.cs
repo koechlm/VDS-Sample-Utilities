@@ -226,7 +226,7 @@ namespace QuickstartUtilityLibrary
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
                     Sheet m_Sheet = m_DrawDoc.Sheets[1];
                     DrawingView m_DrwView = m_Sheet.DrawingViews[1];
-                    m_ModelPath = m_DrwView.ReferencedDocumentDescriptor.FullDocumentName;
+                    m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
                     return m_ModelPath;
                 }
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kPresentationDocumentObject)
@@ -247,15 +247,22 @@ namespace QuickstartUtilityLibrary
         public bool m_FDUActive(object mInvApp)
         {
             m_Inv = (Application)mInvApp;
-            ApplicationAddIn mFDUAddIn = m_Inv.ApplicationAddIns.get_ItemById("{031C8B05-13C0-4C6C-B8FD-5A19DACCB64F}");
-            if (mFDUAddIn !=null)
+            try
             {
-                if (mFDUAddIn.Activated)
+                ApplicationAddIn mFDUAddIn = m_Inv.ApplicationAddIns.get_ItemById("{031C8B05-13C0-4C6C-B8FD-5A19DACCB64F}");
+                if (mFDUAddIn != null)
                 {
-                    return true;
+                    if (mFDUAddIn.Activated)
+                    {
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         public Dictionary<string, string> m_GetFdsKeys(object m_InvApp, Dictionary<string, string> mFdsKeys)
