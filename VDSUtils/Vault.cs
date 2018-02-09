@@ -8,6 +8,7 @@ using Autodesk.Connectivity.WebServicesTools;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Connections;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.PersistentId;
+using VDF = Autodesk.DataManagement.Client.Framework;
 using Inventor;
 using AcInterop = Autodesk.AutoCAD.Interop;
 using AcInteropCom = Autodesk.AutoCAD.Interop.Common;
@@ -77,6 +78,20 @@ namespace QuickstartUtilityLibrary
             catch
             {
                 return false;
+            }
+        }
+
+        public List<string> mGetFiles()
+        {
+            List<string> mFiles = null;
+            try
+            {
+
+                return mFiles;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 
@@ -173,6 +188,7 @@ namespace QuickstartUtilityLibrary
         Inventor.DrawingDocument m_DrawDoc = null;
         Inventor.PresentationDocument m_IpnDoc = null;
         String m_ModelPath = null;
+        Inventor.CommandManager m_InvCmdMgr = null;
 
         [System.Runtime.InteropServices.DllImport("User32.dll", SetLastError = true)]
         static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
@@ -244,6 +260,55 @@ namespace QuickstartUtilityLibrary
             return m_ModelPath = "";
         }
 
+        public Inventor.Application m_InventorApplication()
+        {
+            // Try to get an active instance of Inventor
+            try
+            {
+                return System.Runtime.InteropServices.Marshal.GetActiveObject("Inventor.Application") as Inventor.Application;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public string m_ActiveDocFullFileName(object m_InvApp)
+        {
+            m_Inv = (Inventor.Application)m_InvApp;
+            if (m_Inv.ActiveDocument != null)
+            {
+                return m_Inv.ActiveDocument.FullFileName;
+            }
+            else
+            {
+                return null;
+            }
+                
+        }
+
+        public void m_PlaceComponent(object m_InvApp, String m_CompFullFileName)
+        {
+            m_Inv = (Inventor.Application)m_InvApp;
+            if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+            {
+                try
+                {
+                    m_InvCmdMgr = m_Inv.CommandManager;
+                    m_InvCmdMgr.PostPrivateEvent(PrivateEventTypeEnum.kFileNameEvent, m_CompFullFileName);
+                    Inventor.ControlDefinition m_InvCtrlDef = (ControlDefinition)m_InvCmdMgr.ControlDefinitions["AssemblyPlaceComponentCmd"];
+                    //bring Inventor to front
+                    IntPtr mWinPt = (IntPtr)m_Inv.MainFrameHWND;
+                    SwitchToThisWindow(mWinPt, true);
+                    m_InvCtrlDef.Execute();
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
         public bool m_FDUActive(object mInvApp)
         {
             m_Inv = (Application)mInvApp;
@@ -264,7 +329,6 @@ namespace QuickstartUtilityLibrary
                 return false;
             }
         }
-
         public Dictionary<string, string> m_GetFdsKeys(object m_InvApp, Dictionary<string, string> mFdsKeys)
         {
             try
