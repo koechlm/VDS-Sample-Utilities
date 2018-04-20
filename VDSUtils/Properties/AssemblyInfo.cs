@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Quickstart VDS Utilities")]
-[assembly: AssemblyDescription("Quickstart VDS Extension 2018")]
+[assembly: AssemblyDescription("Quickstart VDS Extension 2019")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Autodesk")]
-[assembly: AssemblyProduct("Quickstart Utility Library 2018")]
-[assembly: AssemblyCopyright("Copyright © Markus Koechl, Autodesk 2017")]
+[assembly: AssemblyProduct("Quickstart Utility Library 2019")]
+[assembly: AssemblyCopyright("Copyright © Markus Koechl, Autodesk 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2018.1.0.2")]
-[assembly: AssemblyFileVersion("2018.1.0.2")]
+[assembly: AssemblyVersion("2019.24.0.0")]
+[assembly: AssemblyFileVersion("2019.24.0.0")]
