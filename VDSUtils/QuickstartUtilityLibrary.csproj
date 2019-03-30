@@ -63,6 +63,10 @@
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Vault Professional 2020\Explorer\Autodesk.AutoCAD.Interop.Common.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Autodesk.Connectivity.Explorer.ExtensibilityTools">
+      <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2020 SDK\bin\x64\Autodesk.Connectivity.Explorer.ExtensibilityTools.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Autodesk.Connectivity.WebServices">
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Vault Professional 2020\Explorer\Autodesk.Connectivity.WebServices.dll</HintPath>
       <Private>False</Private>

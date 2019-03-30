@@ -9,6 +9,7 @@ using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Connections;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.PersistentId;
 using VDF = Autodesk.DataManagement.Client.Framework;
+using ACET = Autodesk.Connectivity.Explorer.ExtensibilityTools;
 using Inventor;
 using AcInterop = Autodesk.AutoCAD.Interop;
 using AcInteropCom = Autodesk.AutoCAD.Interop.Common;
@@ -176,7 +177,83 @@ namespace QuickstartUtilityLibrary
                 return null;
             }
         }
+
+        /// <summary>
+        /// Update file properties
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="mFile"></param>
+        /// <param name="mPropDictonary"></param>
+        /// <returns>True if updated successfully</returns>
+        public bool mUpdateFileProperties(VDF.Vault.Currency.Connections.Connection conn,
+            Autodesk.Connectivity.WebServices.File mFile, Dictionary<Autodesk.Connectivity.WebServices.PropDef, object> mPropDictonary)
+        {
+            try
+            {
+                ACET.IExplorerUtil mExplUtil = Autodesk.Connectivity.Explorer.ExtensibilityTools.ExplorerLoader.LoadExplorerUtil(
+                                            conn.Server, conn.Vault, conn.UserID, conn.Ticket);
+
+                mExplUtil.UpdateFileProperties(mFile, mPropDictonary);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Downloads Vault file using full file path, e.g. "$/Designs/Base.ipt". Returns full file name in local working folder (download enforces override, if local file exists),
+        /// returns "FileNotFound if file does not exist at indicated location.
+        /// Preset Options: Download Children (recursively) = Enabled, Enforce Overwrite = True
+        /// </summary>
+        /// <param name="conn">Current Vault Connection</param>
+        /// <param name="VaultFullFileName">FullFilePath</param>
+        /// <param name="CheckOut">Optional. File downloaded does NOT check-out as default.</param>
+        /// <returns>Local path/filename or error statement "FileNotFound"</returns>
+        public string mGetFileByFullFileName(VDF.Vault.Currency.Connections.Connection conn, string VaultFullFileName, bool CheckOut = false)
+        {
+            List<string> mFiles = new List<string>();
+            mFiles.Add(VaultFullFileName);
+            Autodesk.Connectivity.WebServices.File[] wsFiles = conn.WebServiceManager.DocumentService.FindLatestFilesByPaths(mFiles.ToArray());
+            VDF.Vault.Currency.Entities.FileIteration mFileIt = new VDF.Vault.Currency.Entities.FileIteration(conn, (wsFiles[0]));
+
+            VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(conn);
+            if (CheckOut)
+            {
+                settings.DefaultAcquisitionOption = VDF.Vault.Settings.AcquireFilesSettings.AcquisitionOption.Checkout;
+            }
+            else
+            {
+                settings.DefaultAcquisitionOption = VDF.Vault.Settings.AcquireFilesSettings.AcquisitionOption.Download;
+            }
+            settings.OptionsRelationshipGathering.FileRelationshipSettings.IncludeChildren = true;
+            settings.OptionsRelationshipGathering.FileRelationshipSettings.RecurseChildren = true;
+            settings.OptionsRelationshipGathering.FileRelationshipSettings.VersionGatheringOption = VDF.Vault.Currency.VersionGatheringOption.Latest;
+            settings.OptionsRelationshipGathering.IncludeLinksSettings.IncludeLinks = false;
+            VDF.Vault.Settings.AcquireFilesSettings.AcquireFileResolutionOptions mResOpt = new VDF.Vault.Settings.AcquireFilesSettings.AcquireFileResolutionOptions();
+            mResOpt.OverwriteOption = VDF.Vault.Settings.AcquireFilesSettings.AcquireFileResolutionOptions.OverwriteOptions.ForceOverwriteAll;
+            mResOpt.SyncWithRemoteSiteSetting = VDF.Vault.Settings.AcquireFilesSettings.SyncWithRemoteSite.Always;
+            settings.AddFileToAcquire(mFileIt, settings.DefaultAcquisitionOption);
+            VDF.Vault.Results.AcquireFilesResults results = conn.FileManager.AcquireFiles(settings);
+            if (results != null)
+            {
+                try
+                {
+                    VDF.Vault.Results.FileAcquisitionResult mFilesDownloaded = results.FileResults.Last();
+                    return mFilesDownloaded.LocalPath.FullPath.ToString();
+                }
+                catch (Exception)
+                {
+                    return "FileFoundButDownloadFailed";
+                }
+            }
+            return "FileNotFound";
+        }
+
     }
+
 
     /// <summary>
     /// Library of VDS Quickstart calls to hosting Inventor session
