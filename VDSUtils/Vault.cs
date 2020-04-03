@@ -312,29 +312,28 @@ namespace QuickstartUtilityLibrary
             try
             {
                 m_Inv = (Inventor.Application)m_InvApp;
-                //if (m_ConnectInv()==true)
-                //{
+
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kDrawingDocumentObject)
                 {
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
-                    Sheet m_Sheet = m_DrawDoc.Sheets[1];
+                    Sheet m_Sheet = m_DrawDoc.ActiveSheet;
                     DrawingView m_DrwView = m_Sheet.DrawingViews[1];
                     m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
                     return m_ModelPath;
                 }
+
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kPresentationDocumentObject)
                 {
                     m_IpnDoc = (PresentationDocument)m_Inv.ActiveDocument;
                     m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
                     return m_ModelPath;
                 }
-                //}
+                return m_ModelPath = "Active Document is neither Drawing nor Presentation.";
             }
             catch
             {
-                return m_ModelPath = "";
+                return m_ModelPath = "Unhandled exception - Retrieving model file path";
             }
-            return m_ModelPath = "";
         }
 
         public Inventor.Application m_InventorApplication()
@@ -445,6 +444,7 @@ namespace QuickstartUtilityLibrary
             }
             return mFdsKeys;
         }
+
         public Dictionary<string, string> m_GetFdsAcadProps(object m_InvApp, Dictionary<string, string> mFdsKeys)
         {
             Inventor.Document mDwgSource = null;
@@ -545,7 +545,7 @@ namespace QuickstartUtilityLibrary
         static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
 
         /// <summary>
-        /// Get AutoCAD session hosting; deprecated as VDS 2017 dialogs share the hosting application object
+        /// Get AutoCAD session hosting; deprecated as VDS >2017 dialogs share the hosting application object
         /// </summary>
         /// <returns></returns>
         private Boolean m_ConnectAcad()
@@ -588,7 +588,7 @@ namespace QuickstartUtilityLibrary
 
 
         /// <summary>
-        /// Switch running AutoCAD application; requires updated - VDS 2017 shares application object in VDS Dialog
+        /// Switch running AutoCAD application; requires updated - VDS >2017 shares application object in VDS Dialog
         /// </summary>
         private void m_GoToAcad(object m_AcadApp)
         {
