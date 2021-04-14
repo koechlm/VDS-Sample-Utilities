@@ -336,6 +336,36 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+        /// <summary>
+        /// Delete orphaned drawing sheets. Sheet format consuming workflows likely cause an unused sheet1
+        /// </summary>
+        /// <param name="m_InvApp"></param>
+        /// <returns>false on unhandled errors, else true</returns>
+        public bool m_RemoveOrphanedSheets(object m_InvApp)
+        {
+            try
+            {
+                m_Inv = (Inventor.Application)m_InvApp;
+
+                if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kDrawingDocumentObject)
+                {
+                    m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
+                    foreach (Sheet sheet in m_DrawDoc.Sheets)
+                    {
+                        if (sheet.DrawingViews.Count == 0)
+                        {
+                            sheet.Delete(false);
+                        }
+                    }
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public Inventor.Application m_InventorApplication()
         {
             // Try to get an active instance of Inventor
