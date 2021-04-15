@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickstartUtilityLibrary", "VDSUtils\QuickstartUtilityLibrary.csproj", "{07BD9346-7387-4D5B-B5A5-7A4FFFC8DEA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDS-Sample-Utilities", "VDSUtils\VDS-Sample-Utilities.csproj", "{07BD9346-7387-4D5B-B5A5-7A4FFFC8DEA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

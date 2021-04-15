@@ -15,12 +15,12 @@ using AcInterop = Autodesk.AutoCAD.Interop;
 using AcInteropCom = Autodesk.AutoCAD.Interop.Common;
 
 /// <summary>
-/// Quickstart Library to extend VDS scripting capabilities.
+/// VDS Sample Library to extend VDS scripting capabilities.
 /// </summary>
-namespace QuickstartUtilityLibrary
+namespace VdsSampleUtilities
 {
     /// <summary>
-    /// Quickstart Library to extend VDS scripting capabilities.
+    /// Class extending VDS Vault scripts
     /// </summary>
     public class VltHelpers
 
@@ -82,20 +82,7 @@ namespace QuickstartUtilityLibrary
             }
         }
 
-        public List<string> mGetFiles()
-        {
-            List<string> mFiles = null;
-            try
-            {
-
-                return mFiles;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
+        
         /// <summary>
         /// LinkManager.GetLinkedChildren has an override list; the input is of type IEntity. 
         /// This wrapper allows to input commonly known object types, like Ids and entity names instead.
@@ -256,7 +243,7 @@ namespace QuickstartUtilityLibrary
 
 
     /// <summary>
-    /// Library of VDS Quickstart calls to hosting Inventor session
+    /// Class sharing options to interact with hosting Inventor session
     /// </summary>
     public class InvHelpers
     {
@@ -294,11 +281,11 @@ namespace QuickstartUtilityLibrary
                     }
                 }
             }
-            catch
+            catch (Exception)
             {
-                return "Error retrieving iProperty";
+                throw;
             }
-            return "iProperty not found";
+            return null;
         }
 
         /// <summary>
@@ -328,18 +315,18 @@ namespace QuickstartUtilityLibrary
                     m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
                     return m_ModelPath;
                 }
-                return m_ModelPath = "Active Document is neither Drawing nor Presentation.";
+                return null;
             }
-            catch
+            catch (Exception)
             {
-                return m_ModelPath = "Unhandled exception - Retrieving model file path";
+                throw;
             }
         }
 
         /// <summary>
         /// Delete orphaned drawing sheets. Sheet format consuming workflows likely cause an unused sheet1
         /// </summary>
-        /// <param name="m_InvApp"></param>
+        /// <param name="m_InvApp">Inventor Application ($Application)</param>
         /// <returns>false on unhandled errors, else true</returns>
         public bool m_RemoveOrphanedSheets(object m_InvApp)
         {
@@ -366,6 +353,10 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+        /// <summary>
+        /// Return running Inventor application
+        /// </summary>
+        /// <returns></returns>
         public Inventor.Application m_InventorApplication()
         {
             // Try to get an active instance of Inventor
@@ -379,6 +370,12 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+
+        /// <summary>
+        /// Return active Inventor document
+        /// </summary>
+        /// <param name="m_InvApp">Inventor Application ($Application)</param>
+        /// <returns></returns>
         public string m_ActiveDocFullFileName(object m_InvApp)
         {
             m_Inv = (Inventor.Application)m_InvApp;
@@ -393,6 +390,12 @@ namespace QuickstartUtilityLibrary
                 
         }
 
+
+        /// <summary>
+        /// Place component in active Inventor assembly document; deprecated: VDS includes 'Insert to CAD' as a default.
+        /// </summary>
+        /// <param name="m_InvApp"></param>
+        /// <param name="m_CompFullFileName"></param>
         public void m_PlaceComponent(object m_InvApp, String m_CompFullFileName)
         {
             m_Inv = (Inventor.Application)m_InvApp;
@@ -415,6 +418,12 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+
+        /// <summary>
+        /// validate active Factory Design Utility AddIn
+        /// </summary>
+        /// <param name="mInvApp">Inventor Application ($Application)</param>
+        /// <returns></returns>
         public bool m_FDUActive(object mInvApp)
         {
             m_Inv = (Application)mInvApp;
@@ -430,11 +439,18 @@ namespace QuickstartUtilityLibrary
                 }
                 return false;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }
         }
+
+        /// <summary>
+        /// Return FDU key/value pairs to identify Factory Layout or Factory Asset files
+        /// </summary>
+        /// <param name="m_InvApp">Inventor Application ($Application)</param>
+        /// <param name="mFdsKeys">empty dictonary</param>
+        /// <returns></returns>
         public Dictionary<string, string> m_GetFdsKeys(object m_InvApp, Dictionary<string, string> mFdsKeys)
         {
             try
@@ -475,6 +491,12 @@ namespace QuickstartUtilityLibrary
             return mFdsKeys;
         }
 
+        /// <summary>
+        /// Return custom iPropertyset for AutoCAD files handled by Inventor FDU
+        /// </summary>
+        /// <param name="m_InvApp">Inventor Application ($Application)</param>
+        /// <param name="mFdsKeys">empty Dictonary of String, String</param>
+        /// <returns></returns>
         public Dictionary<string, string> m_GetFdsAcadProps(object m_InvApp, Dictionary<string, string> mFdsKeys)
         {
             Inventor.Document mDwgSource = null;
@@ -562,8 +584,10 @@ namespace QuickstartUtilityLibrary
         }
 
     }
+
+
     /// <summary>
-    /// Library of VDS Quickstart calls to hosting AutoCAD session
+    /// /// Class sharing options to interact with hosting AutoCAD session
     /// </summary>
     public class AcadHelpers
     {
@@ -591,6 +615,11 @@ namespace QuickstartUtilityLibrary
             }
         }
 
+        /// <summary>
+        /// Check for FDS Blocks in AutoCAD drawings
+        /// </summary>
+        /// <param name="m_AcadApp">AutoCAD Application ($Application)</param>
+        /// <returns>True for Blocknames containing "FDS"</returns>
         public Boolean mFdsDrawing(object m_AcadApp)
         {
             mAcad = (AcInterop.AcadApplication)m_AcadApp;
@@ -607,6 +636,7 @@ namespace QuickstartUtilityLibrary
             return false;
         }
 
+
         private Boolean mFdsDict(object m_AcadApp)
         {
             mAcad = (AcInterop.AcadApplication)m_AcadApp;
@@ -618,19 +648,17 @@ namespace QuickstartUtilityLibrary
 
 
         /// <summary>
-        /// Switch running AutoCAD application; requires updated - VDS >2017 shares application object in VDS Dialog
+        /// Switch running AutoCAD application
         /// </summary>
+        /// <param name="m_AcadApp">AutoCAD Application ($Application)</param>
         private void m_GoToAcad(object m_AcadApp)
         {
-
             try
             {
                 mAcad = (AcInterop.AcadApplication)m_AcadApp;
                 mAcDoc = mAcad.ActiveDocument;
                 IntPtr mWinPt = (IntPtr)mAcad.HWND;
                 SwitchToThisWindow(mWinPt, true);
-                //String m_Command = @"(Command ""_Insert"" ""C:/AB_Vault/Konstruktion/01-0080.dwg"") "";"" ";
-                //m_AcDoc.SendCommand(m_Command);
             }
             catch (Exception ex)
             {
