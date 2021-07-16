@@ -305,21 +305,27 @@ namespace VdsSampleUtilities
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
                     Sheet m_Sheet = m_DrawDoc.ActiveSheet;
                     DrawingView m_DrwView = m_Sheet.DrawingViews[1];
-                    m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
-                    return m_ModelPath;
+                    if (!(m_DrwView is null))
+                    {
+                        m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
+                        return m_ModelPath;
+                    }
                 }
 
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kPresentationDocumentObject)
                 {
                     m_IpnDoc = (PresentationDocument)m_Inv.ActiveDocument;
-                    m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
-                    return m_ModelPath;
+                    if (m_IpnDoc.ReferencedDocuments.Count >= 1)
+                    {
+                        m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
+                        return m_ModelPath;
+                    }
                 }
                 return null;
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
 
