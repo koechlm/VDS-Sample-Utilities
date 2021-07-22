@@ -345,7 +345,7 @@ namespace VdsSampleUtilities
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
                     foreach (Sheet sheet in m_DrawDoc.Sheets)
                     {
-                        if (sheet.DrawingViews.Count == 0)
+                        if (sheet.DrawingViews.Count == 0 && sheet != m_DrawDoc.ActiveSheet)
                         {
                             sheet.Delete(false);
                         }
