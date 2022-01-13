@@ -318,21 +318,27 @@ namespace QuickstartUtilityLibrary
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
                     Sheet m_Sheet = m_DrawDoc.ActiveSheet;
                     DrawingView m_DrwView = m_Sheet.DrawingViews[1];
-                    m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
-                    return m_ModelPath;
+                    if (!(m_DrwView is null))
+                    {
+                        m_ModelPath = m_DrwView.ReferencedFile.FullFileName;
+                        return m_ModelPath;
+                    }
                 }
 
                 if (m_Inv.ActiveDocumentType == DocumentTypeEnum.kPresentationDocumentObject)
                 {
                     m_IpnDoc = (PresentationDocument)m_Inv.ActiveDocument;
-                    m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
-                    return m_ModelPath;
+                    if (m_IpnDoc.ReferencedDocuments.Count >= 1)
+                    {
+                        m_ModelPath = m_IpnDoc.ReferencedDocuments[1].FullDocumentName;
+                        return m_ModelPath;
+                    }
                 }
-                return m_ModelPath = "Active Document is neither Drawing nor Presentation.";
+                return null;
             }
             catch
             {
-                return m_ModelPath = "Unhandled exception - Retrieving model file path";
+                return null;
             }
         }
 
@@ -352,7 +358,7 @@ namespace QuickstartUtilityLibrary
                     m_DrawDoc = (DrawingDocument)m_Inv.ActiveDocument;
                     foreach (Sheet sheet in m_DrawDoc.Sheets)
                     {
-                        if (sheet.DrawingViews.Count == 0)
+                        if (sheet.DrawingViews.Count == 0 && sheet != m_DrawDoc.ActiveSheet)
                         {
                             sheet.Delete(false);
                         }
@@ -390,7 +396,7 @@ namespace QuickstartUtilityLibrary
             {
                 return null;
             }
-                
+
         }
 
         public void m_PlaceComponent(object m_InvApp, String m_CompFullFileName)
@@ -445,7 +451,7 @@ namespace QuickstartUtilityLibrary
                 {
                     //FDS Type
                     mFdsKeys.Add("FdsType", "FDS-Layout");
-                   
+
                     //FDS Property Set exists for syncronized layouts
                     foreach (PropertySet m_PropSet in m_Doc.PropertySets)
                     {
