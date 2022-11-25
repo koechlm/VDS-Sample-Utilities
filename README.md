@@ -1,5 +1,6 @@
-# VDS-Sample-Utilities
-Extended functions for VDS Vault, VDS AutoCAD and VDS Inventor
+# VDS-Sample-Utilities 2022
+Extended functions for VDS Vault, VDS AutoCAD and VDS Inventor 2022.
+(access 2023 version here: https://github.com/koechlm/VDS-Sample-Utilities-2023)
 
 Library providing functions to interact with each host of the Vault Data Standard extension. 
 The compiled library is part of several Data Standard Sample Configurations published under this account.
